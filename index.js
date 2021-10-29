@@ -47,7 +47,7 @@ app.post('/transaction-receipts', async (request, response) => {
         tasks.push(
             new Promise(async (resolve, reject) => {
                 try {
-                    const receipt = await web3.eth.getTransactionReceipt(hashes); 
+                    const receipt = await web3.eth.getTransactionReceipt(hash); 
                     resolve({ hash, receipt }); 
                 } catch (error) {
                     resolve({ hash, receipt: null });
