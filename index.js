@@ -23,4 +23,38 @@ app.post('/nonces', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
+app.post('/contract-codes', async (request, response) => {
+    const contracts = request.body.contracts;
+    const tasks = [];
+    contracts.forEach((contract) => {
+        tasks.push(
+            new Promise(async (resolve, reject) => {
+                try {
+                    const code = await web3.eth.getCode(contract); 
+                    resolve({ contract, code }); 
+                } catch (error) {
+                    resolve({ contract, code: "0x" });
+                }
+            })
+        )
+    }); 
+    response.send(await Promise.all(tasks)); 
+});
+app.post('/transaction-receipts', async (request, response) => {
+    const hashes = request.body.hashes;
+    const tasks = [];
+    hashes.forEach((hash) => {
+        tasks.push(
+            new Promise(async (resolve, reject) => {
+                try {
+                    const receipt = await web3.eth.getTransactionReceipt(hashes); 
+                    resolve({ hash, receipt }); 
+                } catch (error) {
+                    resolve({ hash, receipt: null });
+                }
+            })
+        )
+    }); 
+    response.send(await Promise.all(tasks)); 
+});
 app.listen(80);
