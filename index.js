@@ -23,3 +23,4 @@ app.post('/nonces', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
+app.listen(80);
