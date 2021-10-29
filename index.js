@@ -11,13 +11,13 @@ app.post('/nonces', async (request, response) => {
     const tasks = [];
     accounts.forEach((account) => {
         tasks.push(
-            new Promise((resolve, reject) => {
-                web3.eth.getTransactionCount(account).then((count) => {
-                    count = count || 0; 
+            new Promise(async (resolve, reject) => {
+                try {
+                    const count = await web3.eth.getTransactionCount(account); 
                     resolve({ account, count }); 
-                }).catch(err => {
-                    resolve({ account, count: 0 })
-                })
+                } catch (error) {
+                    resolve({ account, count: 0 });
+                }
             })
         )
     }); 
