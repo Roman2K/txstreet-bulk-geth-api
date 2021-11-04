@@ -4,6 +4,8 @@ const net = require('net');
 const Web3 = require('web3'); 
 const web3 = new Web3(new Web3.providers.IpcProvider('/mnt/geth/geth.ipc', net));
 const app = Express();
+const dotenv = require('dotenv');
+dotenv.config({}); 
 app.use(Express.json({ limit: '50mb' }));
 app.use(cors());
 app.post('/nonces', async (request, response) => {
@@ -57,4 +59,6 @@ app.post('/transaction-receipts', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
-app.listen(80);
+const port = process.env.PORT || 80;
+app.listen(port);
+console.log("listening on port " + port);
