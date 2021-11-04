@@ -2,10 +2,11 @@ const Express = require('express');
 const cors = require('cors');
 const net = require('net');
 const Web3 = require('web3'); 
-const web3 = new Web3(new Web3.providers.IpcProvider('/mnt/geth/geth.ipc', net));
-const app = Express();
 const dotenv = require('dotenv');
 dotenv.config({}); 
+const ipc = process.env.IPC || '/mnt/geth/geth.ipc';
+const web3 = new Web3(new Web3.providers.IpcProvider(ipc, net));
+const app = Express();
 app.use(Express.json({ limit: '50mb' }));
 app.use(cors());
 app.post('/nonces', async (request, response) => {
