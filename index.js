@@ -1,14 +1,30 @@
 const Express = require('express');
-const cors = require('cors');
-const net = require('net');
-const Web3 = require('web3'); 
-const dotenv = require('dotenv');
+const cors    = require('cors');
+const net     = require('net');
+const Web3    = require('web3');
+const dotenv  = require('dotenv');
+
 dotenv.config({}); 
-const ipc = process.env.IPC || '/mnt/geth/geth.ipc';
-const web3 = new Web3(new Web3.providers.IpcProvider(ipc, net));
-const app = Express();
-app.use(Express.json({ limit: '50mb' }));
-app.use(cors());
+
+const provider = () => {
+  const rpcUrl  = process.env.RPC_URL; // Example: "http://eth-node:8545"
+  const ipcPath = process.env.IPC || '/mnt/geth/geth.ipc';
+
+  if (rpcUrl) {
+    console.log(`Connecting to RPC endpoint: ${rpcUrl}`);
+    return new Web3.providers.HttpProvider(rpcUrl);
+  }
+
+  console.log(`Connecting to IPC: ${ipcPath}`);
+  return new Web3.providers.IpcProvider(ipcPath, net);
+}
+
+const web3 = new Web3(provider());
+const app =
+  Express().
+    use(Express.json({ limit: '50mb' })).
+    use(cors());
+
 app.post('/nonces', async (request, response) => {
     const accounts = request.body.accounts;
     const tasks = [];
@@ -26,6 +42,7 @@ app.post('/nonces', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
+
 app.post('/contract-codes', async (request, response) => {
     const contracts = request.body.contracts;
     const tasks = [];
@@ -43,6 +60,7 @@ app.post('/contract-codes', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
+
 app.post('/transaction-receipts', async (request, response) => {
     const hashes = request.body.hashes;
     const tasks = [];
@@ -60,6 +78,7 @@ app.post('/transaction-receipts', async (request, response) => {
     }); 
     response.send(await Promise.all(tasks)); 
 });
+
 const port = process.env.PORT || 80;
 app.listen(port);
 console.log("listening on port " + port);
