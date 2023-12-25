@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eo pipefail
+
+port=${PORT-80}
+
+result=`
+  wget --quiet -O- \
+    --header 'Content-Type: application/json' \
+    --post-data '{"accounts": []}' \
+    http://localhost:${port}/nonces
+`
+echo result=$result
+
+[[ "$result" == "[]" ]]
