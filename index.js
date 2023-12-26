@@ -35,6 +35,10 @@ app.post('/nonces', async (request, response) => {
           const count = await web3.eth.getTransactionCount(account); 
           resolve({ account, count }); 
         } catch (error) {
+          console.error(
+            `Error while getting code of contract ${account}: ${error}`
+          );
+
           resolve({ account, count: 0 });
         }
       })
@@ -53,6 +57,10 @@ app.post('/contract-codes', async (request, response) => {
           const code = await web3.eth.getCode(contract); 
           resolve({ contract, code }); 
         } catch (error) {
+          console.error(
+            `Error while getting code of contract ${contract}: ${error}`
+          );
+
           resolve({ contract, code: "0x" });
         }
       })
@@ -71,6 +79,10 @@ app.post('/transaction-receipts', async (request, response) => {
           const receipt = await web3.eth.getTransactionReceipt(hash); 
           resolve({ hash, receipt }); 
         } catch (error) {
+          console.error(
+            `Error while getting transaction receipt of ${hash}: ${error}`
+          );
+
           resolve({ hash, receipt: null });
         }
       })
