@@ -3,12 +3,14 @@ set -eo pipefail
 
 port=${PORT-80}
 
+# Test: get contract code of USDC
 result=`
   wget --quiet -O- \
     --header 'Content-Type: application/json' \
-    --post-data '{"accounts": []}' \
-    http://localhost:${port}/nonces
+    --post-data '{"contracts": ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]}' \
+    http://localhost:${port}/contract-codes
 `
-echo result=$result
+echo "$result" | head -c 120
 
-[[ "$result" == "[]" ]]
+echo "$result" \
+  | grep -q 'ffff1690602001909291908035906020019082018035906020019190919293919'
