@@ -1,8 +1,9 @@
-const Express = require('express');
-const cors  = require('cors');
-const net   = require('net');
-const Web3  = require('web3');
-const dotenv  = require('dotenv');
+const Express         = require('express');
+const cors            = require('cors');
+const net             = require('net');
+const { Web3 }        = require('web3');
+const dotenv          = require('dotenv');
+const { IpcProvider } = require('web3-providers-ipc');
 
 dotenv.config({}); 
 
@@ -12,18 +13,18 @@ const provider = () => {
 
   if (rpcUrl) {
     console.log(`Connecting to RPC endpoint: ${rpcUrl}`);
-    return new Web3.providers.HttpProvider(rpcUrl);
+    return rpcUrl;
   }
 
   console.log(`Connecting to IPC: ${ipcPath}`);
-  return new Web3.providers.IpcProvider(ipcPath, net);
+  return new IpcProvider(ipcPath, net);
 }
 
 const web3 = new Web3(provider());
 const app =
   Express().
-  use(Express.json({ limit: '50mb' })).
-  use(cors());
+    use(Express.json({ limit: '50mb' })).
+    use(cors());
 
 app.post('/nonces', async (request, response) => {
   const accounts = request.body.accounts;
