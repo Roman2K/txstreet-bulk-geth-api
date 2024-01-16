@@ -19,4 +19,6 @@ HEALTHCHECK \
   --start-period=40s \
   CMD /docker-healthcheck
 
+STOPSIGNAL SIGINT
+
 CMD ["node", "index.js"]
