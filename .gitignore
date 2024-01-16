@@ -1,3 +1,6 @@
+*.bak
+
 /node_modules
 /.env
 /.tool-versions
+/_tools
