@@ -1,4 +1,5 @@
-const Express         = require('express');
+import express, {Express, Request, Response} from "express";
+
 const cors            = require('cors');
 const net             = require('net');
 const { Web3 }        = require('web3');
@@ -21,15 +22,28 @@ const provider = () => {
 }
 
 const web3 = new Web3(provider());
-const app =
-  Express().
-    use(Express.json({ limit: '50mb' })).
+const app: Express =
+  express().
+    use(express.json({ limit: '50mb' })).
     use(cors());
 
-app.post('/nonces', async (request, response) => {
+// Enable BigInt JSON serialization.
+//
+// Avoids `TypeError: Do not know how to serialize a BigInt`
+(BigInt.prototype as any).toJSON = function() {
+  return this.toString()
+};
+
+type NonceResult = {
+  account: string;
+  count: number;
+};
+
+app.post('/nonces', async (request: Request, response: Response) => {
   const accounts = request.body.accounts;
-  const tasks = [];
-  accounts.forEach((account) => {
+  const tasks: Promise<NonceResult>[] = [];
+
+  accounts.forEach((account: string) => {
     tasks.push(
       new Promise(async (resolve, reject) => {
         try {
@@ -37,7 +51,7 @@ app.post('/nonces', async (request, response) => {
           resolve({ account, count }); 
         } catch (error) {
           console.error(
-            `Error while getting code of contract ${account}: ${error}`
+            `Error while getting transaction count of ${account}: ${error}`
           );
 
           resolve({ account, count: 0 });
@@ -45,13 +59,20 @@ app.post('/nonces', async (request, response) => {
       })
     )
   }); 
+
   response.send(await Promise.all(tasks)); 
 });
 
-app.post('/contract-codes', async (request, response) => {
+type ContractCodeResult = {
+  contract: string;
+  code: string;
+};
+
+app.post('/contract-codes', async (request: Request, response: Response) => {
   const contracts = request.body.contracts;
-  const tasks = [];
-  contracts.forEach((contract) => {
+  const tasks: Promise<ContractCodeResult>[] = [];
+
+  contracts.forEach((contract: string) => {
     tasks.push(
       new Promise(async (resolve, reject) => {
         try {
@@ -67,13 +88,20 @@ app.post('/contract-codes', async (request, response) => {
       })
     )
   }); 
+
   response.send(await Promise.all(tasks)); 
 });
 
-app.post('/transaction-receipts', async (request, response) => {
+type TransactionReceiptResult = {
+  hash: string;
+  receipt: string | null;
+};
+
+app.post('/transaction-receipts', async (request: Request, response: Response) => {
   const hashes = request.body.hashes;
-  const tasks = [];
-  hashes.forEach((hash) => {
+  const tasks: Promise<TransactionReceiptResult>[] = [];
+
+  hashes.forEach((hash: string) => {
     tasks.push(
       new Promise(async (resolve, reject) => {
         try {
@@ -89,6 +117,7 @@ app.post('/transaction-receipts', async (request, response) => {
       })
     )
   }); 
+
   response.send(await Promise.all(tasks)); 
 });
 
