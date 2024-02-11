@@ -121,6 +121,10 @@ app.post('/transaction-receipts', async (request: Request, response: Response) =
   response.send(await Promise.all(tasks)); 
 });
 
+app.get('/ping', async (request: Request, response: Response) => {
+  response.send("Pong\n");
+});
+
 const port = process.env.PORT || 80;
 app.listen(port);
 console.log("listening on port " + port);
